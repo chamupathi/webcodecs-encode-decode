@@ -18,12 +18,14 @@ const suppproted = isSupportedBrowser();
 if (suppproted) {
   await initDisplayDimentions(canvas, video);
 
+  showHideElement(document.getElementById("start-text"), true);
+
   // Add an onclick event handler
   button.onclick = async () => {
     await start();
   };
 } else {
-  const unsuppotedText = document.getElementById("unsuppotedText");
+  const unsuppotedText = document.getElementById("unsuppoted-text");
 
   showHideElement(unsuppotedText, true);
   showHideElement(button, false);
@@ -43,14 +45,21 @@ const beforeCapture = () => {
   showHideElement(canvas, false);
   showHideElement(button, false);
   showHideElement(video, true);
+  showHideElement(document.getElementById("start-text"), false);
+  showHideElement(document.getElementById("recording-text"), true);
+
 };
 
 const afterCapture = () => {
   showHideElement(video, false);
   showHideElement(canvas, true);
+  showHideElement(document.getElementById("recording-text"), false);
+  showHideElement(document.getElementById("preview-text"), true);
 };
 
 const afterDisplay = () => {
   showHideElement(button, true);
   showHideElement(canvas, false);
+  showHideElement(document.getElementById("preview-text"), false);
+  showHideElement(document.getElementById("start-text"), true);
 };
