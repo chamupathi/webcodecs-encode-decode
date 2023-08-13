@@ -10,9 +10,12 @@ const canvas = document.getElementById("canvas");
 const video = document.getElementById("video");
 const button = document.getElementById("start-button");
 
-const colorStream = [
+
+const COLOR_STREAM = [
   0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
 ];
+
+const NUM_OF_FRAMES_PER_SEC = 2;
 
 const suppproted = isSupportedBrowser();
 if (suppproted) {
@@ -21,7 +24,6 @@ if (suppproted) {
   showHideElement(document.getElementById("start-text"), true);
   showHideElement(button, true);
 
-  // Add an onclick event handler
   button.onclick = async () => {
     await start();
   };
@@ -32,15 +34,20 @@ if (suppproted) {
   showHideElement(button, false);
 }
 
+/**
+ * start the recording and then shows the recorded frames
+ */
 const start = async () => {
   beforeCapture();
-  const capture = new ColorStramVideoEncoder(colorStream, 2);
+  const capture = new ColorStramVideoEncoder(COLOR_STREAM, NUM_OF_FRAMES_PER_SEC);
   const data = await capture.captureFrames();
   afterCapture();
 
   const display = new DataVideoDecoder();
   await display.displayFrames(data, afterDisplay);
 };
+
+
 
 const beforeCapture = () => {
   showHideElement(canvas, false);
