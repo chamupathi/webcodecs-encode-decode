@@ -19,6 +19,7 @@ if (suppproted) {
   await initDisplayDimentions(canvas, video);
 
   showHideElement(document.getElementById("start-text"), true);
+  showHideElement(button, true);
 
   // Add an onclick event handler
   button.onclick = async () => {
