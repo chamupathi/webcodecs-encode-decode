@@ -10,7 +10,6 @@ const canvas = document.getElementById("canvas");
 const video = document.getElementById("video");
 const button = document.getElementById("start-button");
 
-
 const COLOR_STREAM = [
   0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
 ];
@@ -25,7 +24,12 @@ if (suppproted) {
   showHideElement(button, true);
 
   button.onclick = async () => {
-    await start();
+    try {
+      await start();
+    } catch (error) {
+      console.error(error);
+      afterDisplay();
+    }
   };
 } else {
   const unsuppotedText = document.getElementById("unsuppoted-text");
@@ -39,7 +43,10 @@ if (suppproted) {
  */
 const start = async () => {
   beforeCapture();
-  const capture = new ColorStramVideoEncoder(COLOR_STREAM, NUM_OF_FRAMES_PER_SEC);
+  const capture = new ColorStramVideoEncoder(
+    COLOR_STREAM,
+    NUM_OF_FRAMES_PER_SEC
+  );
   const data = await capture.captureFrames();
   afterCapture();
 
@@ -47,15 +54,12 @@ const start = async () => {
   await display.displayFrames(data, afterDisplay);
 };
 
-
-
 const beforeCapture = () => {
   showHideElement(canvas, false);
   showHideElement(button, false);
   showHideElement(video, true);
   showHideElement(document.getElementById("start-text"), false);
   showHideElement(document.getElementById("recording-text"), true);
-
 };
 
 const afterCapture = () => {
