@@ -10,24 +10,29 @@ const canvas = document.getElementById("canvas");
 const video = document.getElementById("video");
 const button = document.getElementById("start-button");
 
+const colorStream = [
+  0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
+];
+
 const suppproted = isSupportedBrowser();
 if (suppproted) {
   await initDisplayDimentions(canvas, video);
+
+  showHideElement(document.getElementById("start-text"), true);
+  showHideElement(button, true);
 
   // Add an onclick event handler
   button.onclick = async () => {
     await start();
   };
 } else {
-  const unsuppotedText = document.getElementById("unsuppotedText");
+  const unsuppotedText = document.getElementById("unsuppoted-text");
 
   showHideElement(unsuppotedText, true);
   showHideElement(button, false);
 }
 
 const start = async () => {
-  const colorStream = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1];
-
   beforeCapture();
   const capture = new ColorStramVideoEncoder(colorStream, 2);
   const data = await capture.captureFrames();
@@ -41,14 +46,21 @@ const beforeCapture = () => {
   showHideElement(canvas, false);
   showHideElement(button, false);
   showHideElement(video, true);
+  showHideElement(document.getElementById("start-text"), false);
+  showHideElement(document.getElementById("recording-text"), true);
+
 };
 
 const afterCapture = () => {
   showHideElement(video, false);
   showHideElement(canvas, true);
+  showHideElement(document.getElementById("recording-text"), false);
+  showHideElement(document.getElementById("preview-text"), true);
 };
 
 const afterDisplay = () => {
   showHideElement(button, true);
   showHideElement(canvas, false);
+  showHideElement(document.getElementById("preview-text"), false);
+  showHideElement(document.getElementById("start-text"), true);
 };

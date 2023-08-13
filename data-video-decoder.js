@@ -83,7 +83,10 @@ export class DataVideoDecoder {
   _renderFrame = async () => {
     this.underflow = this.pendingFrames.length == 0;
 
-    if (this.underflow) return;
+    if (this.underflow) {
+      this.callback?.();
+      return;
+    }
 
     const frame = this.pendingFrames.shift();
 
@@ -98,12 +101,8 @@ export class DataVideoDecoder {
     this.ctx.drawImage(frame, 0, 0);
     frame.close();
 
-    // Immediately schedule rendering of the next frame
-    if (this.pendingFrames.length) {
-      setTimeout(this._renderFrame, 0);
-    } else {
-      this.callback?.();
-    }
+    // Immediately schedule rendering of the next frame till all the frames are renderred
+    setTimeout(this._renderFrame, 0);
   };
 
   _calculateTimeUntilNextFrame = (timestamp) => {
