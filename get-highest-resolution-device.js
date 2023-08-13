@@ -13,14 +13,14 @@ const getHighestresolutionDevice = async () => {
 
     let highestResolution = 0;
     let selectedDeviceId = null;
-    let width = 0
+    let width = 0;
     let height = 0;
-
 
     for (const device of videoDevices) {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: device.deviceId, facingMode: "user" },
       });
+
       const track = stream.getVideoTracks()[0];
       const settings = track.getSettings();
 
@@ -34,7 +34,7 @@ const getHighestresolutionDevice = async () => {
       stopMediaTracks(stream); // Release the stream to avoid resource leaks
     }
 
-    return { deviceId : selectedDeviceId, width, height };
+    return { deviceId: selectedDeviceId, width, height };
   } catch (error) {
     console.error("Error selecting camera:", error);
     return null;

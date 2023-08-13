@@ -22,15 +22,17 @@ export class ColorStramVideoEncoder {
     this.data = [];
     await this._initDevice();
 
-    if(!this.deviceId) {
-      return
+    if (!this.deviceId) {
+      return;
     }
 
     const noOfFrames = this.colorStream.length;
 
     const supported = await this.isEncodingConfigSupported();
 
-    if (!supported || !this.deviceId) return;
+    if (!supported) {
+      throw new Error ('The encoding config is not supported')
+    };
 
     this._initEncoder();
 
@@ -44,38 +46,62 @@ export class ColorStramVideoEncoder {
       const reader = trackProcessor.readable.getReader();
       const video = document.getElementById(videoElementId || "video");
 
-
+      // Set the stram to video element so that it will display in the page
       video.srcObject = stream;
 
       let frameCount = 0;
       let nextTimeStamp = 0;
 
+      // Loop until cature the required number of frames
       while (frameCount < noOfFrames) {
+        
+        // Run necessory changes need to happen before the frame capture.
+        // i.e. Changing the background color
+        this._handleBeforeFrameCapture(frameCount);
+
         const result = await reader.read();
         if (result.done) break;
 
         const frame = result.value;
 
         if (nextTimeStamp > frame.timestamp) {
+          // the required frame already captured for the current time frame.
+          // ignore this frame
           frame.close();
           continue;
         }
 
-        this._handleBeforeFrameCapture(frameCount);
+        // If hit here, a new frame needs to be encoded for the current time frame.
 
-        nextTimeStamp = nextTimeStamp + 1_000_000 / this.framesPerSec;
-
-        frameCount++;
+        if (this.encoder.encodeQueueSize > 2) {
+          // Too many frames in flight, encoder is overwhelmed
+          // let's drop this frame.
+          frame.close();
+          continue;
+        }
 
         this.encoder.encode(frame);
         frame.close();
+
+        /**
+         * The next frame should be captures after hitting this time
+         * 
+         * For frequancy `2` frames per second,
+         *      The time stamps will be updates as
+         *      0s, 0.5s, 1.0s, 1.5s, ....
+         *      The encoder will encode one frame as soon as the timestap is less than the frame time stamp.
+         *      Then the encoder will wait till the next time stamp    
+         */
+        nextTimeStamp = nextTimeStamp + 1_000_000 / this.framesPerSec;
+
+        frameCount++;
       }
 
-      // stop showing web cam video
+      // Stop showing web cam video
       video.srcObject = null;
       stream.getTracks().forEach((track) => track.stop());
 
-      // revert any chages left by _handleBeforeFrameCapture
+      // Revert any chages left by _handleBeforeFrameCapture
       this._handleAfterFrameCapture();
 
       await this.encoder.flush();
@@ -89,6 +115,7 @@ export class ColorStramVideoEncoder {
   _handleBeforeFrameCapture = (idx) => {
     const color = this.colorConfig[this.colorStream[idx]];
     if (!color) return;
+
     document.body.style.backgroundColor = color;
   };
 
@@ -98,6 +125,7 @@ export class ColorStramVideoEncoder {
 
   isEncodingConfigSupported = async () => {
     const { supported } = await VideoEncoder.isConfigSupported(this.config);
+    
     return supported;
   };
 
@@ -106,10 +134,11 @@ export class ColorStramVideoEncoder {
 
     const device = await getHighestresolutionDevice();
 
-    
-    this.deviceId = device?.deviceId;
-    this.width = device?.width;
-    this.height = device?.height;
+    if (!device) {
+      throw new Error("No supporting device found!");
+    }
+
+    this.deviceId = device.deviceId;
   };
 
   _initEncoder = () => {
@@ -137,4 +166,3 @@ export class ColorStramVideoEncoder {
 
   _handleError = (e) => console.error(e.message);
 }
-

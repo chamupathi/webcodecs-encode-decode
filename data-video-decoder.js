@@ -12,7 +12,9 @@ export class DataVideoDecoder {
   /**
    * Display captured frames in a canves
    *
+   * @param {dataChunk[]} data - array of encoded video chunks
    * @param {string} canvasElementId - element Id of the canvas element [optional]
+   * @param {function}  callbck - a function which will run after displaying all the frames
    */
   displayFrames = async (data, callback, canvasElementId) => {
     if (!Array.isArray(data)) {
@@ -24,9 +26,6 @@ export class DataVideoDecoder {
     }
 
     this.data = data;
-
-    this.baseTime = 0;
-    this.underflow = true;
 
     this._initCanvas(canvasElementId);
 
@@ -95,9 +94,11 @@ export class DataVideoDecoder {
     const timeUntilNextFrame = this._calculateTimeUntilNextFrame(
       frame.timestamp
     );
+
     await new Promise((r) => {
       setTimeout(r, timeUntilNextFrame);
     });
+    
     this.ctx.drawImage(frame, 0, 0);
     frame.close();
 
@@ -107,6 +108,7 @@ export class DataVideoDecoder {
 
   _calculateTimeUntilNextFrame = (timestamp) => {
     if (this.baseTime == 0) this.baseTime = performance.now();
+
     let mediaTime = performance.now() - this.baseTime;
     return Math.max(0, timestamp / 1000 - mediaTime);
   };
