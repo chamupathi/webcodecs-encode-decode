@@ -10,6 +10,10 @@ const canvas = document.getElementById("canvas");
 const video = document.getElementById("video");
 const button = document.getElementById("start-button");
 
+const colorStream = [
+  0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
+];
+
 const suppproted = isSupportedBrowser();
 if (suppproted) {
   await initDisplayDimentions(canvas, video);
@@ -26,8 +30,6 @@ if (suppproted) {
 }
 
 const start = async () => {
-  const colorStream = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1];
-
   beforeCapture();
   const capture = new ColorStramVideoEncoder(colorStream, 2);
   const data = await capture.captureFrames();
