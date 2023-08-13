@@ -13,7 +13,7 @@ Welcome to **Web Codecs Encode and Decode**! This is a simple web application de
 - [Display the frames]: display the captured frames 
 
 ## How to Run
-To run **Web Codecs Encode and Decodee**, follow these steps:
+To run **Web Codecs Encode and Decode**, follow these steps:
 
 1. Clone this repository to your local machine:
 ```
