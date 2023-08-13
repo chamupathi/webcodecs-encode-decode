@@ -23,7 +23,6 @@ export class ColorStramVideoEncoder {
     await this._initDevice();
 
     if(!this.deviceId) {
-      console.log('here')
       return
     }
 
