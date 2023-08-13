@@ -23,6 +23,8 @@ export class DataVideoDecoder {
       this.callback = callback;
     }
 
+    this.renderedCount = 0
+
     this.data = data;
 
     this.baseTime = 0;
@@ -98,8 +100,10 @@ export class DataVideoDecoder {
     this.ctx.drawImage(frame, 0, 0);
     frame.close();
 
-    // Immediately schedule rendering of the next frame
-    if (this.pendingFrames.length) {
+    this.renderedCount = this.renderedCount + 1;
+
+    // Immediately schedule rendering of the next frame till all the frames are renderred
+    if (this.renderedCount < this.data.length) {
       setTimeout(this._renderFrame, 0);
     } else {
       this.callback?.();

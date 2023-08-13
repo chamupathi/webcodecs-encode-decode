@@ -50,7 +50,7 @@ export class ColorStramVideoEncoder {
       let frameCount = 0;
       let nextTimeStamp = 0;
 
-      while (frameCount <= noOfFrames) {
+      while (frameCount < noOfFrames) {
         const result = await reader.read();
         if (result.done) break;
 
