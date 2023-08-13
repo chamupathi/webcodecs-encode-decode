@@ -26,6 +26,9 @@ export class DataVideoDecoder {
     }
 
     this.data = data;
+    this.framecount = this.data.length;
+
+    this.renderedFramecount = 0;
 
     this._initCanvas(canvasElementId);
 
@@ -82,8 +85,12 @@ export class DataVideoDecoder {
   _renderFrame = async () => {
     this.underflow = this.pendingFrames.length == 0;
 
-    if (this.underflow) {
+    if (this.renderedFramecount >= this.framecount) {
       this.callback?.();
+      return;
+    }
+    
+    if(this.underflow) {
       return;
     }
 
@@ -104,6 +111,9 @@ export class DataVideoDecoder {
 
     // Immediately schedule rendering of the next frame till all the frames are renderred
     setTimeout(this._renderFrame, 0);
+
+    // increment the rendred frame count
+    this.renderedFramecount = this.renderedFramecount+1
   };
 
   _calculateTimeUntilNextFrame = (timestamp) => {
