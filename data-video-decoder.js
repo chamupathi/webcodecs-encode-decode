@@ -91,6 +91,11 @@ export class DataVideoDecoder {
     }
     
     if(this.underflow) {
+      /**
+       * deocder was not fast enough to decode the frame. 
+       * _renderFrame method ran without any pending frames, however there are more frames to render.
+       * return here because there are no new frame to render
+       */
       return;
     }
 
